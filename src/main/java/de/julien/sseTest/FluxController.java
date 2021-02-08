@@ -35,11 +35,14 @@ public class FluxController {
     @GetMapping(value = "/ok", produces = MediaType.TEXT_PLAIN_VALUE)
     public String ok() {
         sinks.forEach((key, value) -> {
-            Sinks.EmitResult result = value.tryEmitNext(new TestEntity(key, 18, true));
+            Sinks.EmitResult result = value.tryEmitNext(TestEntity.builder()
+                    .name(key)
+                    .age(18)
+                    .human(true).build());
             log.info(key + " sub count: " + value.currentSubscriberCount());
 
             if (result.isFailure()) {
-                log.severe("emit failed, removing sink");
+                log.severe("emit failed, no client is lsitening to " + key);
             }
         });
 
